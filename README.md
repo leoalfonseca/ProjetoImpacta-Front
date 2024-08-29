@@ -2,15 +2,12 @@
 
 ## Overview
 
-This repository serves as a template for kickstarting a new project. 
-It includes a standard project structure, configuration files, and essential scripts to help 
-streamline the initial setup and development process.
+Projeto para conclusão do curso de ADS da Faculdade Impacta
 
 ## Features
 
-- Dashboard
-- Users module as an example for CRUD
-- Calendar module
+- Dashboard (Mock API)
+- Login Module (Funcional)
 
 ## Tech Stack
 
@@ -23,17 +20,25 @@ streamline the initial setup and development process.
 
 <!-- #default-branch-switch -->
 
-Clone it and run:
+Exemplo de .env:
+
+MODE=dev
+ENVIRONMENT=dev
+API_URL=http://localhost:4000
+SECRET_KEY=ZmVkYWY3ZDg4NjNiNDhlMTk3YjkyODdkNDkyYjdcwOGU=
+
+
+Clonar e rode os seguintes comandos no terminal:
 
 ```sh
 npm install
 npm run dev
 ```
 
-## Upcoming Features
+## Próximas features
 
 <!-- #default-branch-switch -->
 
-- Language Changer
-- New modules
-- Removing Mock API and integrating with a ASP Net Core API
+- Integração da Dashboard com o back-end
+- Módulo de administração de usuários
+- Módulo de cadastro de vendas
