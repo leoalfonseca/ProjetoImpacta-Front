@@ -26,24 +26,24 @@ const Menuitems: MenuitemsType[] = [
     subheader: 'Menu',
   },
 
-  {
-    id: uniqueId(),
-    title: 'Dashboard',
-    icon: IconDashboard,
-    href: '/home',
-  },
+  // {
+  //   id: uniqueId(),
+  //   title: 'Dashboard',
+  //   icon: IconDashboard,
+  //   href: '/home',
+  // },
   {
     id: uniqueId(),
     title: 'Usuários',
     icon: IconUserCircle,
     href: '/admin/users',
   },
-  {
-    id: uniqueId(),
-    title: 'Calendário',
-    icon: IconCalendar,
-    href: '/calendar',
-  },
+  // {
+  //   id: uniqueId(),
+  //   title: 'Calendário',
+  //   icon: IconCalendar,
+  //   href: '/calendar',
+  // },
 ];
 
 export default Menuitems;

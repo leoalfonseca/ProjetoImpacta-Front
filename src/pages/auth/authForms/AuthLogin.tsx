@@ -5,6 +5,9 @@ import {
   FormControlLabel,
   Button,
   Stack,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
 } from '@mui/material';
 import { loginType } from 'types/auth/auth';
 import CustomCheckbox from 'components/forms/theme-elements/CustomCheckbox';
@@ -12,8 +15,9 @@ import CustomTextField from 'components/forms/theme-elements/CustomTextField';
 import CustomFormLabel from 'components/forms/theme-elements/CustomFormLabel';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from 'context/AuthContext';
+import { VisibilityOff, Visibility } from '@mui/icons-material';
 
 interface IFormValues {
   username: string;
@@ -22,6 +26,10 @@ interface IFormValues {
 
 const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
   const { signIn } = useContext(AuthContext);
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show: any) => !show);
 
   const schemaLogin = yup.object({
     username: yup.string().required('Usuário Obrigatório'),
@@ -86,15 +94,22 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
         </Box>
         <Box>
           <CustomFormLabel htmlFor="password">Senha</CustomFormLabel>
-          <CustomTextField
-            id="password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            {...formik.getFieldProps('password')}
-            error={formik.touched.password && Boolean(formik.errors.password)}
-            helperText={formik.touched.password && formik.errors.password}
-          />
+          <OutlinedInput
+              fullWidth
+              name="password"
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton onClick={handleClickShowPassword} edge="end">
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
         </Box>
         <Stack
           justifyContent="space-between"

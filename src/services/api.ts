@@ -1,5 +1,5 @@
-import { storageGetToken, storageRemoveToken } from "storage/storageToken";
-import axios from "axios";
+import { storageGetToken, storageRemoveToken } from 'storage/storageToken';
+import axios from 'axios';
 
 const api = axios.create({
   baseURL: process.env.API_URL,
@@ -19,10 +19,10 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    console.error(error)
+    console.error(error);
     if (error.response.status === 401) {
       await storageRemoveToken();
-      window.location.replace("/");
+      window.location.replace('/');
     }
 
     return Promise.reject(error);

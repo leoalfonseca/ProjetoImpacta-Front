@@ -1,8 +1,12 @@
+import { VisibilityOff, Visibility } from '@mui/icons-material';
 import {
   FormControl,
   Grid,
+  IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
+  OutlinedInput,
   Select,
   TextField,
   Typography,
@@ -10,7 +14,8 @@ import {
 import GenericModal from 'components/genericModal/baseModal';
 import { UserContext } from 'context/UserContext';
 import { useFormik } from 'formik';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
+import { UserProps } from 'types/user';
 import * as yup from 'yup';
 
 interface IUserRegisterProps {
@@ -18,33 +23,25 @@ interface IUserRegisterProps {
   handleClose: () => void;
 }
 
-interface IFormValues {
-  id: string;
-  status: string;
-  name: string;
-  username: string;
-  email: string;
-  budget: number;
-}
-
 const UserRegisterForm = ({ open, handleClose }: IUserRegisterProps) => {
-  const { createUser, users } = useContext(UserContext);
+  const { createUser } = useContext(UserContext);
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show: any) => !show);
 
   const schemaUsers = yup.object({
-    status: yup.string().required('Campo Obrigatório'),
     name: yup.string().required('Campo Obrigatório'),
     username: yup.string().required('Campo Obrigatório'),
-    budget: yup.number().required('Campo Obrigatório'),
-    // email: yup.string().email('Email inválido').required('Campo Obrigatório'),
+    email: yup.string().email('Email inválido').required('Campo Obrigatório'),
   });
 
-  const initialValues: IFormValues = {
+  const initialValues: UserProps = {
     id: '',
-    status: '',
     name: '',
     username: '',
     email: '',
-    budget: 0,
+    password: '',
   };
 
   const formik = useFormik({
@@ -52,7 +49,6 @@ const UserRegisterForm = ({ open, handleClose }: IUserRegisterProps) => {
     validationSchema: schemaUsers,
     onSubmit: (values) => {
       try {
-        values.id = crypto.randomUUID();
         createUser(values);
       } catch (error) {
         console.log(error);
@@ -81,10 +77,8 @@ const UserRegisterForm = ({ open, handleClose }: IUserRegisterProps) => {
             <TextField
               label="Nome *"
               fullWidth
-              name="name"
               id="name"
-              value={formik.values.name}
-              onChange={formik.handleChange}
+              {...formik.getFieldProps('name')}
               error={formik.touched.name && Boolean(formik.errors.name)}
             />
             <Typography color="error">
@@ -97,10 +91,8 @@ const UserRegisterForm = ({ open, handleClose }: IUserRegisterProps) => {
             <TextField
               label="Nome de usuário *"
               fullWidth
-              name="username"
               id="username"
-              value={formik.values.username}
-              onChange={formik.handleChange}
+              {...formik.getFieldProps('username')}
               error={formik.touched.username && Boolean(formik.errors.username)}
             />
             <Typography color="error">
@@ -113,10 +105,8 @@ const UserRegisterForm = ({ open, handleClose }: IUserRegisterProps) => {
             <TextField
               label="Email *"
               fullWidth
-              name="email"
               id="email"
-              value={formik.values.email}
-              onChange={formik.handleChange}
+              {...formik.getFieldProps('email')}
               error={formik.touched.email && Boolean(formik.errors.email)}
             />
             <Typography color="error">
@@ -126,34 +116,26 @@ const UserRegisterForm = ({ open, handleClose }: IUserRegisterProps) => {
         </Grid>
         <Grid item xs={12}>
           <FormControl fullWidth>
-            <TextField
-              label="Budget *"
-              fullWidth
-              name="budget"
-              id="budget"
-              value={formik.values.budget}
-              onChange={formik.handleChange}
-              error={formik.touched.budget && Boolean(formik.errors.budget)}
-            />
-          </FormControl>
-        </Grid>
-        <Grid item xs={12}>
-          <FormControl variant="outlined" fullWidth>
-            <InputLabel id="status" htmlFor="status">
-              Status *
+            <InputLabel htmlFor="outlined-adornment-password">
+              Senha *
             </InputLabel>
-            <Select
-              label="Status *"
-              labelId="status"
-              id="status"
-              {...formik.getFieldProps('status')}
-              error={formik.touched.status && Boolean(formik.errors.status)}
-            >
-              <MenuItem value={'Ativo'}>Ativo</MenuItem>
-              <MenuItem value={'Inativo'}>Inativo</MenuItem>
-            </Select>
+            <OutlinedInput
+              fullWidth
+              label="Senha *"
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              {...formik.getFieldProps('password')}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton onClick={handleClickShowPassword} edge="end">
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
             <Typography color="error">
-              {formik.touched.status && formik.errors.status}
+              {formik.touched.email && formik.errors.email}
             </Typography>
           </FormControl>
         </Grid>

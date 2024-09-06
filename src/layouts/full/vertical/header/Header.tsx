@@ -80,7 +80,7 @@ const Header = () => {
               <IconSun size="20" />
             )}
           </IconButton>
-          <Notifications />
+          {/* <Notifications /> */}
           {lgDown ? <MobileRightSidebar /> : null}
           <Profile />
         </Stack>

@@ -16,6 +16,8 @@ interface IAuthContext {
   signUp: (dataUser: UserProps) => void;
   login: boolean;
   setLogin: React.Dispatch<React.SetStateAction<boolean>>;
+  getProfile: () => void;
+  user: UserProps;
 }
 
 const AuthContext = React.createContext({} as IAuthContext);
@@ -23,6 +25,7 @@ const AuthContext = React.createContext({} as IAuthContext);
 const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
   const router = useRouter();
   const [login, setLogin] = useState(true);
+  const [user, setUser] = useState({} as UserProps);
 
   const signIn = async (dataLogin: AuthProps) => {
     try {
@@ -35,13 +38,13 @@ const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
         password: encryptedPassword,
       });
 
-      storageSetToken(data.token);
+      storageSetToken(data);
 
-      api.defaults.headers.Authorization = `Bearer ${data.token}`;
+      api.defaults.headers.Authorization = `Bearer ${data}`;
 
       toast.success('Usuário logado com sucesso!');
 
-      router.push('/home');
+      router.push('/admin/users');
     } catch (error: any) {
       toast.error('Usuário ou senha inválidos');
       throw error;
@@ -63,13 +66,23 @@ const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
 
   const signOut = async () => {
     try {
-      router.push('/login');
-      storageRemoveToken();
+      await storageRemoveToken();
+      router.push('/');
       api.defaults.headers.Authorization = '';
     } catch (error) {
       console.log(error);
     }
   };
+
+  async function getProfile() {
+    try {
+      const { data } = await api.get('auth/profile');
+      console.log(data);
+      setUser(data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <AuthContext.Provider
@@ -79,6 +92,8 @@ const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
         signUp,
         login,
         setLogin,
+        getProfile,
+        user,
       }}
     >
       {children}

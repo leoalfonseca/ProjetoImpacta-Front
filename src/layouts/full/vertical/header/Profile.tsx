@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Link from 'next/link';
 import {
   Box,
@@ -12,8 +12,11 @@ import {
 
 import { IconMail } from '@tabler/icons-react';
 import { Stack } from '@mui/system';
+import { AuthContext } from 'context/AuthContext';
 
 const Profile = () => {
+
+  const { signOut } = useContext(AuthContext);
   const [anchorEl2, setAnchorEl2] = useState(null);
   const handleClick2 = (event: any) => {
     setAnchorEl2(event.currentTarget);
@@ -97,10 +100,9 @@ const Profile = () => {
         <Divider />
         <Box mt={2}>
           <Button
-            href="/"
+            onClick={signOut}
             variant="outlined"
             color="primary"
-            component={Link}
             fullWidth
           >
             Desconectar

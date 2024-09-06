@@ -18,6 +18,7 @@ import { IValueGetter } from 'types/valueGetter';
 import { get } from 'http';
 import { useSelector } from 'react-redux';
 import { AppState } from 'store/Store';
+import { storageGetToken } from 'storage/storageToken';
 
 const UsersTable = () => {
   const [downloadMenuAnchor, setDownloadMenuAnchor] =
@@ -33,11 +34,9 @@ const UsersTable = () => {
 
   const handleExportToExcel = () => {
     const exportData = rows.map((item) => ({
-      Status: item.status,
       Nome: item.name,
       'Nome de Usuário': item.username,
       Email: item.email,
-      Budget: item.budget,
     }));
 
     const ws = XLSX.utils.json_to_sheet(exportData);
@@ -60,31 +59,21 @@ const UsersTable = () => {
 
   const handleExportToPDF = () => {
     const exportData: any = rows.map((item) => ({
-      Status: item.status,
       Nome: item.name,
       'Nome de Usuário': item.username,
       Email: item.email,
-      Budget: item.budget,
     }));
 
     const doc = new jsPDF('l', 'mm', [297, 400]);
 
     const columns = [
-      { header: 'Status', dataKey: 'Status' },
       { header: 'Nome', dataKey: 'Nome' },
       { header: 'Nome de Usuário', dataKey: 'Nome de Usuário' },
       { header: 'Email', dataKey: 'Email' },
-      { header: 'Budget', dataKey: 'Budget' },
     ];
 
     const rowsPDF = exportData.map((row: any) => {
-      return [
-        row.Status,
-        row.Nome,
-        row['Nome de Usuário'],
-        row.Email,
-        row.Budget,
-      ];
+      return [row.Nome, row['Nome de Usuário'], row.Email];
     });
 
     autoTable(doc, {
@@ -98,27 +87,6 @@ const UsersTable = () => {
   };
 
   const columns = [
-    {
-      field: 'status',
-      headerName: 'Status',
-      headerClassName: 'header',
-      flex: 0.5,
-      minWidth: 140,
-      type: 'singleSelect',
-      valueOptions: ['Ativo', 'Inativo'],
-      valueGetter: (params: any) => {
-        return params.value ? 'Ativo' : 'Inativo';
-      },
-      renderCell: (params: any) => (
-        <Box>
-          {params.value === 'Ativo' ? (
-            <CustomChip label="Ativo" type="success" />
-          ) : params.value === 'Inativo' ? (
-            <CustomChip label="Inativo" type="error" />
-          ) : null}
-        </Box>
-      ),
-    },
     {
       field: 'name',
       headerName: 'Nome',
@@ -137,16 +105,6 @@ const UsersTable = () => {
       headerClassName: 'header',
       flex: 1,
     },
-    {
-      field: 'budget',
-      headerName: 'Budget',
-      headerClassName: 'header',
-      flex: 1,
-      valueGetter: (params: IValueGetter) => {
-        return 'R$ ' + params.value + 'k';
-      },
-    },
-
     {
       field: 'actions',
       headerName: 'Ações',
@@ -214,14 +172,17 @@ const UsersTable = () => {
   const handleClose = () => {
     setOpen(false);
     setOpenEdit(false);
-    getUsersList();
+
+    setTimeout(async () => {
+      getUsersList();
+    }, 1000);
   };
 
-  const { getUsers, deleteUser, users } = useContext(UserContext);
+  const { getUsers, deleteUser } = useContext(UserContext);
 
   const getUsersList = async () => {
-    const usersList = await getUsers();
-    setRows(usersList);
+      const usersList = await getUsers();
+      setRows(usersList);
   };
 
   const handleEditUser = (userId: string) => {
@@ -233,17 +194,14 @@ const UsersTable = () => {
     }
   };
 
-  const handleDeleteUser = (userId: string) => {
-    deleteUser(userId);
+  const handleDeleteUser = async (userId: string) => {
+    await deleteUser(userId);
+    await getUsersList();
   };
 
   useEffect(() => {
     getUsersList();
   }, []);
-
-  useEffect(() => {
-    setRows(users);
-  }, [users]);
 
   return (
     <LocalizationProvider
@@ -344,7 +302,7 @@ const UsersTable = () => {
             }}
           >
             <DataGrid
-              rows={rows}
+              rows={rows || []}
               columns={columns}
               hideFooterSelectedRowCount
               initialState={{

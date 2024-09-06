@@ -51,6 +51,16 @@ const MyApp = (props: MyAppProps) => {
   const layout = pageProps.layout || 'Full';
   const Layout = layouts[Component.layout] || FullLayout;
 
+  // const { getProfile } = useContext(AuthContext);
+
+  // useEffect(() => {
+  //   const token = storageGetToken();
+
+  //   if (token) {
+  //     getProfile();
+  //   }
+  // }, []);
+
   return (
     //@ts-ignore
     <CacheProvider value={emotionCache}>

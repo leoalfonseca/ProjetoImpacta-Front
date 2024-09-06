@@ -27,34 +27,32 @@ const EditUserForm = ({ open, handleClose, user }: EditUserFormProps) => {
 
   const [initialValues, setInitialValues] = useState({
     id: user?.id || '',
-    status: user?.status || '',
     name: user?.name || '',
     username: user?.username || '',
     email: user?.email || '',
-    budget: user?.budget || '',
   });
 
   const schemaUsers = yup.object({
-    status: yup.string(),
     name: yup.string(),
     username: yup.string(),
-    budget: yup.number(),
     email: yup.string().email('Email inválido'),
   });
 
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: schemaUsers,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       if (user) {
         const dataUpdated = compareValues(initialValues, values);
 
         if (Object.keys(dataUpdated).length > 0) {
-          editUser(user.id, dataUpdated);
-          handleCloseAndClear();
+          await editUser(user.id ?? '', dataUpdated);
         } else {
           toast.error('Nenhuma alteração foi feita!');
         }
+
+        formik.resetForm();
+        handleCloseAndClear();
       }
     },
   });
@@ -67,19 +65,15 @@ const EditUserForm = ({ open, handleClose, user }: EditUserFormProps) => {
   useEffect(() => {
     if (user) {
       formik.setFieldValue('id', user?.id);
-      formik.setFieldValue('status', user?.status);
       formik.setFieldValue('name', user?.name);
       formik.setFieldValue('username', user?.username);
       formik.setFieldValue('email', user?.email);
-      formik.setFieldValue('budget', user?.budget);
 
       setInitialValues({
         id: user?.id,
-        status: user?.status,
         name: user?.name,
         email: user?.email,
         username: user?.username,
-        budget: user?.budget,
       });
     }
   }, [user]);
@@ -98,72 +92,40 @@ const EditUserForm = ({ open, handleClose, user }: EditUserFormProps) => {
             <TextField
               label="Nome *"
               fullWidth
-              name="name"
               id="name"
-              value={formik.values.name}
-              onChange={formik.handleChange}
+              {...formik.getFieldProps('name')}
               error={formik.touched.name && Boolean(formik.errors.name)}
             />
+            <Typography color="error">
+              {formik.touched.name && formik.errors.name}
+            </Typography>
           </FormControl>
         </Grid>
-
         <Grid item xs={12}>
           <FormControl fullWidth>
             <TextField
               label="Nome de usuário *"
               fullWidth
-              name="username"
               id="username"
-              value={formik.values.username}
-              onChange={formik.handleChange}
+              {...formik.getFieldProps('username')}
               error={formik.touched.username && Boolean(formik.errors.username)}
             />
+            <Typography color="error">
+              {formik.touched.username && formik.errors.username}
+            </Typography>
           </FormControl>
         </Grid>
-
         <Grid item xs={12}>
           <FormControl fullWidth>
             <TextField
               label="Email *"
               fullWidth
-              name="email"
               id="email"
-              value={formik.values.email}
-              onChange={formik.handleChange}
+              {...formik.getFieldProps('email')}
               error={formik.touched.email && Boolean(formik.errors.email)}
             />
-          </FormControl>
-        </Grid>
-        <Grid item xs={12}>
-          <FormControl fullWidth>
-            <TextField
-              label="Budget *"
-              fullWidth
-              name="budget"
-              id="budget"
-              value={formik.values.budget}
-              onChange={formik.handleChange}
-              error={formik.touched.budget && Boolean(formik.errors.budget)}
-            />
-          </FormControl>
-        </Grid>
-        <Grid item xs={12}>
-          <FormControl variant="outlined" fullWidth>
-            <InputLabel id="status" htmlFor="status">
-              Status *
-            </InputLabel>
-            <Select
-              label="Status *"
-              labelId="status"
-              id="status"
-              {...formik.getFieldProps('status')}
-              error={formik.touched.status && Boolean(formik.errors.status)}
-            >
-              <MenuItem value={'Ativo'}>Ativo</MenuItem>
-              <MenuItem value={'Inativo'}>Inativo</MenuItem>
-            </Select>
             <Typography color="error">
-              {formik.touched.status && formik.errors.status}
+              {formik.touched.email && formik.errors.email}
             </Typography>
           </FormControl>
         </Grid>

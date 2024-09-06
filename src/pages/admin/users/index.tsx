@@ -13,7 +13,7 @@ const GroupPage = () => {
   ];
 
   return (
-    // <ProtectRoute>
+    <ProtectRoute>
     <Box display="flex" flexDirection="column" height="80vh">
       <Head>
         <title>Usuários</title>
@@ -32,7 +32,7 @@ const GroupPage = () => {
         <UsersTable />
       </Box>
     </Box>
-    // </ProtectRoute>
+    </ProtectRoute>
   );
 };
 
