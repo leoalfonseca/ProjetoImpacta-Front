@@ -1,4 +1,3 @@
-import React, { Suspense, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { AppProps } from 'next/app';
 import { ThemeProvider } from '@mui/material/styles';
@@ -23,11 +22,13 @@ import 'utils/i18n';
 import 'react-quill/dist/quill.snow.css';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import './calendar/Calendar.css';
 import { UserProvider } from 'context/UserContext';
 import { AuthContext, AuthProvider } from 'context/AuthContext';
 import { storageGetToken } from 'storage/storageToken';
 
 import './styles.css';
+import { CalendarProvider } from 'context/CalendarContext';
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
 
@@ -85,7 +86,9 @@ export default (props: MyAppProps) => (
     {/* @ts-expect-error*/}
     <AuthProvider>
       <UserProvider>
-        <MyApp {...props} />
+        <CalendarProvider>
+          <MyApp {...props} />
+        </CalendarProvider>
       </UserProvider>
     </AuthProvider>
     {/* @ts-expect-error*/}

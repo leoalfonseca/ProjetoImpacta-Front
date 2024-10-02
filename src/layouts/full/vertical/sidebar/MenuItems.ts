@@ -25,7 +25,6 @@ const Menuitems: MenuitemsType[] = [
     navlabel: true,
     subheader: 'Menu',
   },
-
   // {
   //   id: uniqueId(),
   //   title: 'Dashboard',
@@ -38,12 +37,12 @@ const Menuitems: MenuitemsType[] = [
     icon: IconUserCircle,
     href: '/admin/users',
   },
-  // {
-  //   id: uniqueId(),
-  //   title: 'Calendário',
-  //   icon: IconCalendar,
-  //   href: '/calendar',
-  // },
+  {
+    id: uniqueId(),
+    title: 'Calendário',
+    icon: IconCalendar,
+    href: '/calendar',
+  },
 ];
 
 export default Menuitems;
