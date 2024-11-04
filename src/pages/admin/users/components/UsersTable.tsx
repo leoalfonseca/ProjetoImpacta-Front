@@ -3,7 +3,6 @@ import { DataGrid, ptBR } from '@mui/x-data-grid';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { IconEdit, IconPlus, IconTrash } from '@tabler/icons-react';
-import CustomChip from 'components/CustomChip';
 import { UserContext } from 'context/UserContext';
 import ptBRLocale from 'date-fns/locale/pt-BR';
 import saveAs from 'file-saver';
@@ -14,11 +13,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { UserProps } from 'types/user';
 import * as XLSX from 'xlsx';
 import EditUserForm from './EditUserForm';
-import { IValueGetter } from 'types/valueGetter';
-import { get } from 'http';
 import { useSelector } from 'react-redux';
 import { AppState } from 'store/Store';
-import { storageGetToken } from 'storage/storageToken';
 
 const UsersTable = () => {
   const [downloadMenuAnchor, setDownloadMenuAnchor] =
@@ -32,32 +28,7 @@ const UsersTable = () => {
     setDownloadMenuAnchor(null);
   };
 
-  const handleExportToExcel = () => {
-    const exportData = rows.map((item) => ({
-      Nome: item.name,
-      'Nome de Usuário': item.username,
-      Email: item.email,
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Dados');
-
-    const excelBase64 = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
-
-    const byteCharacters = atob(excelBase64);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const excelBlob = new Blob([new Uint8Array(byteNumbers)], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
-
-    saveAs(excelBlob, 'Exportação Usuários.xlsx');
-  };
-
-  const handleExportToPDF = () => {
+ const handleExportToPDF = () => {
     const exportData: any = rows.map((item) => ({
       Nome: item.name,
       'Nome de Usuário': item.username,
@@ -85,6 +56,33 @@ const UsersTable = () => {
 
     saveAs(pdfBlob, 'Exportação Usuários.pdf');
   };
+
+  const handleExportToExcel = () => {
+    const exportData = rows.map((item) => ({
+      Nome: item.name,
+      'Nome de Usuário': item.username,
+      Email: item.email,
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Dados');
+
+    const excelBase64 = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+
+    const byteCharacters = atob(excelBase64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const excelBlob = new Blob([new Uint8Array(byteNumbers)], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+
+    saveAs(excelBlob, 'Exportação Usuários.xlsx');
+  };
+
+
 
   const columns = [
     {
