@@ -15,6 +15,7 @@ interface MenuitemsType {
   external?: boolean;
 }
 import {
+  IconShoppingCart,
   IconCalendar,
   IconDashboard,
   IconUserCircle,
@@ -42,6 +43,12 @@ const Menuitems: MenuitemsType[] = [
     title: 'Calendário',
     icon: IconCalendar,
     href: '/calendar',
+  },
+  {
+    id: uniqueId(),
+    title: 'Produtos',
+    icon: IconShoppingCart,
+    href: '/products',
   },
 ];
 

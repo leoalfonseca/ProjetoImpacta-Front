@@ -29,6 +29,7 @@ import { storageGetToken } from 'storage/storageToken';
 
 import './styles.css';
 import { CalendarProvider } from 'context/CalendarContext';
+import { ProductProvider } from 'context/ProductContext';
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
 
@@ -70,7 +71,6 @@ const MyApp = (props: MyAppProps) => {
       </Head>
       <ThemeProvider theme={theme}>
         <RTL direction={customizer.activeDir}>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
           <Layout>
             <Component {...pageProps} />
@@ -87,7 +87,9 @@ export default (props: MyAppProps) => (
     <AuthProvider>
       <UserProvider>
         <CalendarProvider>
-          <MyApp {...props} />
+          <ProductProvider>
+            <MyApp {...props} />
+          </ProductProvider>
         </CalendarProvider>
       </UserProvider>
     </AuthProvider>
