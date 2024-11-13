@@ -1,55 +1,59 @@
 import {
+  Autocomplete,
   FormControl,
   Grid,
-  InputLabel,
-  MenuItem,
+  ListItemText,
   TextField,
   Typography,
-  Select,
 } from '@mui/material';
 import GenericModal from 'components/genericModal/baseModal';
-import { UserContext } from 'context/UserContext';
+import { ProductContext } from 'context/ProductContext';
 import { useFormik } from 'formik';
 import { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { UserProps } from 'types/user';
+import { ProductProps } from 'types/product';
 import { compareValues } from 'utils/compareValues';
+import OrderListFunction from 'utils/orderList';
 import * as yup from 'yup';
 
 interface EditUserFormProps {
   open: boolean;
   handleClose: () => void;
-  user: UserProps | null;
+  obj: ProductProps | null;
+  resObj: any;
 }
 
-const EditUserForm = ({ open, handleClose, user }: EditUserFormProps) => {
-  const { editUser } = useContext(UserContext);
+const EditUserForm = ({
+  open,
+  handleClose,
+  obj,
+  resObj,
+}: EditUserFormProps) => {
+  const { editProduct } = useContext(ProductContext);
+
 
   const [initialValues, setInitialValues] = useState({
-    id: user?.id || '',
-    name: user?.name || '',
-    username: user?.username || '',
-    email: user?.email || '',
+    id: obj?.id || '',
+    name: obj?.name || '',
+    stock: obj?.stock || 0,
+    userId: obj?.userId || '',
+    description: obj?.description || '',
   });
 
-  const schemaUsers = yup.object({
+  const schema = yup.object({
     name: yup.string(),
-    username: yup.string(),
-    email: yup.string().email('Email inválido'),
+    stock: yup.string(),
+    userId: yup.string(),
   });
 
   const formik = useFormik({
     initialValues: initialValues,
-    validationSchema: schemaUsers,
+    validationSchema: schema,
     onSubmit: async (values) => {
-      if (user) {
-        const dataUpdated = compareValues(initialValues, values);
+      if (obj) {
 
-        if (Object.keys(dataUpdated).length > 0) {
-          await editUser(user.id ?? '', dataUpdated);
-        } else {
-          toast.error('Nenhuma alteração foi feita!');
-        }
+
+        await editProduct(obj.id ?? '', values);
 
         formik.resetForm();
         handleCloseAndClear();
@@ -63,20 +67,14 @@ const EditUserForm = ({ open, handleClose, user }: EditUserFormProps) => {
   };
 
   useEffect(() => {
-    if (user) {
-      formik.setFieldValue('id', user?.id);
-      formik.setFieldValue('name', user?.name);
-      formik.setFieldValue('username', user?.username);
-      formik.setFieldValue('email', user?.email);
-
-      setInitialValues({
-        id: user?.id,
-        name: user?.name,
-        email: user?.email,
-        username: user?.username,
-      });
+    if (obj) {
+      formik.setFieldValue('name', obj?.name);
+      formik.setFieldValue('stock', obj?.stock);
+      formik.setFieldValue('description', obj?.description);
+      formik.setFieldValue('userId', obj?.user?.id);
     }
-  }, [user]);
+  }, [obj]);
+
 
   return (
     <GenericModal
@@ -90,7 +88,7 @@ const EditUserForm = ({ open, handleClose, user }: EditUserFormProps) => {
         <Grid item xs={12}>
           <FormControl fullWidth>
             <TextField
-              label="Nome *"
+              label="Produto *"
               fullWidth
               id="name"
               {...formik.getFieldProps('name')}
@@ -104,29 +102,59 @@ const EditUserForm = ({ open, handleClose, user }: EditUserFormProps) => {
         <Grid item xs={12}>
           <FormControl fullWidth>
             <TextField
-              label="Nome de usuário *"
+              label="Descrição *"
               fullWidth
-              id="username"
-              {...formik.getFieldProps('username')}
-              error={formik.touched.username && Boolean(formik.errors.username)}
+              id="description"
+              {...formik.getFieldProps('description')}
+              error={
+                formik.touched.description && Boolean(formik.errors.description)
+              }
             />
             <Typography color="error">
-              {formik.touched.username && formik.errors.username}
+              {formik.touched.description && formik.errors.description}
             </Typography>
           </FormControl>
         </Grid>
+
         <Grid item xs={12}>
-          <FormControl fullWidth>
-            <TextField
-              label="Email *"
-              fullWidth
-              id="email"
-              {...formik.getFieldProps('email')}
-              error={formik.touched.email && Boolean(formik.errors.email)}
+          <FormControl variant="outlined" fullWidth>
+            <Autocomplete
+              id="userId"
+              options={resObj ? OrderListFunction(resObj?.users, 'name') : []}
+              getOptionLabel={(option) => option.name}
+              onChange={(event, value) =>
+                formik.setFieldValue('userId', value ? value.id : null)
+              }
+              value={
+                resObj
+                  ? resObj?.users.find(
+                      (s: any) => s.id === formik.values.userId
+                    ) || null
+                  : null
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Responsável *"
+                  variant="outlined"
+                  error={formik.touched.userId && Boolean(formik.errors.userId)}
+                  helperText={
+                    formik.touched.userId &&
+                    formik.errors.userId && (
+                      <Typography variant="caption" color="error">
+                        {formik.errors.userId}
+                      </Typography>
+                    )
+                  }
+                />
+              )}
+              renderOption={(props, item) => (
+                <li {...props} key={item.id}>
+                  <ListItemText>{item.name}</ListItemText>
+                </li>
+              )}
+              noOptionsText="Nada encontrado!"
             />
-            <Typography color="error">
-              {formik.touched.email && formik.errors.email}
-            </Typography>
           </FormControl>
         </Grid>
       </Grid>

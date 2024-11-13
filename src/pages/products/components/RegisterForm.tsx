@@ -26,6 +26,11 @@ const RegisterForm = ({ open, handleClose, resObj }: IRegisterProps) => {
   const schemaUsers = yup.object({
     name: yup.string().required('Campo Obrigatório'),
     description: yup.string().required('Campo Obrigatório'),
+    stock: yup
+      .number()
+      .integer('Por favor insira um número válido.')
+      .typeError('Este campo deve ser um número')
+      .required('Campo Obrigatório'),
   });
 
   const initialValues: ProductProps = {
@@ -40,6 +45,7 @@ const RegisterForm = ({ open, handleClose, resObj }: IRegisterProps) => {
     validationSchema: schemaUsers,
     onSubmit: (values) => {
       try {
+        if (values.stock) values.stock = parseFloat(values?.stock.toString());
         createProduct(values);
       } catch (error) {
         console.log(error);
@@ -98,14 +104,7 @@ const RegisterForm = ({ open, handleClose, resObj }: IRegisterProps) => {
           <FormControl variant="outlined" fullWidth>
             <Autocomplete
               id="userId"
-              options={
-                resObj
-                  ? OrderListFunction(
-                      resObj?.users,
-                      'name'
-                    )
-                  : []
-              }
+              options={resObj ? OrderListFunction(resObj?.users, 'name') : []}
               getOptionLabel={(option) => option.name}
               onChange={(event, value) =>
                 formik.setFieldValue('userId', value ? value.id : null)
@@ -120,7 +119,7 @@ const RegisterForm = ({ open, handleClose, resObj }: IRegisterProps) => {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Coletado por *"
+                  label="Responsável *"
                   variant="outlined"
                   error={formik.touched.userId && Boolean(formik.errors.userId)}
                   helperText={
@@ -139,6 +138,23 @@ const RegisterForm = ({ open, handleClose, resObj }: IRegisterProps) => {
                 </li>
               )}
               noOptionsText="Nada encontrado!"
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={12}>
+          {' '}
+          <FormControl fullWidth>
+            <TextField
+              label="Estoque Inicial *"
+              fullWidth
+              id="stock"
+              {...formik.getFieldProps('stock')}
+              error={formik.touched.stock && Boolean(formik.errors.stock)}
+              helperText={formik.touched.stock && formik.errors.stock}
+              onChange={(event: any) => {
+                const value = event.target.value.replace(',', '.');
+                formik.setFieldValue('stock', value);
+              }}
             />
           </FormControl>
         </Grid>

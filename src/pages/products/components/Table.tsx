@@ -2,7 +2,7 @@ import { Box, Button, Grid, Menu, MenuItem } from '@mui/material';
 import { DataGrid, ptBR } from '@mui/x-data-grid';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { IconEdit, IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconEdit, IconMinus, IconPlus, IconTrash } from '@tabler/icons-react';
 import { ProductContext } from 'context/ProductContext';
 import ptBRLocale from 'date-fns/locale/pt-BR';
 import saveAs from 'file-saver';
@@ -16,6 +16,7 @@ import EditForm from './EditForm';
 import { useSelector } from 'react-redux';
 import { AppState } from 'store/Store';
 import { UserContext } from 'context/UserContext';
+import StockControlForm from './StockControlForm';
 
 const UsersTable = () => {
   const [downloadMenuAnchor, setDownloadMenuAnchor] =
@@ -91,16 +92,94 @@ const UsersTable = () => {
       flex: 1,
     },
     {
-      field: 'product.name',
+      field: 'user',
       headerName: 'Nome de usuário',
       headerClassName: 'header',
       flex: 1,
+      valueGetter: (params: any) => {
+        return params?.value?.name ? params?.value?.name : 'N/A';
+      },
     },
     {
       field: 'stock',
       headerName: 'Estoque',
       headerClassName: 'header',
       flex: 1,
+    },
+    {
+      field: 'control',
+      headerName: 'Controle',
+      flex: 1,
+      type: 'actions',
+      minWidth: 240,
+      headerClassName: 'header',
+      renderCell: (params: { row: any }) => (
+        <Box>
+          <Button
+            startIcon={<IconMinus />}
+            onClick={() => handleEditStock(params.row.id, 'decrease')}
+            sx={
+              customizer.activeMode === 'dark'
+                ? {
+                    backgroundColor: '#253662',
+                    color: '#EAEFF4',
+                    mr: 0.8,
+                    '&:hover': {
+                      backgroundColor: '#172342',
+                      color: '#EAEFF4',
+                    },
+                    '& .MuiButton-startIcon': {
+                      margin: 'auto',
+                    },
+                  }
+                : {
+                    backgroundColor: '#5D87FF',
+                    color: '#ffffff',
+                    mr: 0.8,
+                    '&:hover': {
+                      backgroundColor: '#4261b7',
+                      color: '#ffffff',
+                    },
+                    '& .MuiButton-startIcon': {
+                      margin: 'auto',
+                    },
+                  }
+            }
+          />
+
+          <Button
+            startIcon={<IconPlus />}
+            onClick={() => handleEditStock(params.row.id, 'increase')}
+            sx={
+              customizer.activeMode === 'dark'
+                ? {
+                    backgroundColor: '#253662',
+                    color: '#EAEFF4',
+                    mr: 0.8,
+                    '&:hover': {
+                      backgroundColor: '#172342',
+                      color: '#EAEFF4',
+                    },
+                    '& .MuiButton-startIcon': {
+                      margin: 'auto',
+                    },
+                  }
+                : {
+                    backgroundColor: '#5D87FF',
+                    color: '#ffffff',
+                    mr: 0.8,
+                    '&:hover': {
+                      backgroundColor: '#4261b7',
+                      color: '#ffffff',
+                    },
+                    '& .MuiButton-startIcon': {
+                      margin: 'auto',
+                    },
+                  }
+            }
+          />
+        </Box>
+      ),
     },
     {
       field: 'actions',
@@ -113,7 +192,7 @@ const UsersTable = () => {
         <Box>
           <Button
             startIcon={<IconEdit />}
-            onClick={() => handleEditUser(params.row.id)}
+            onClick={() => handleEdit(params.row.id)}
             sx={
               customizer.activeMode === 'dark'
                 ? {
@@ -153,11 +232,13 @@ const UsersTable = () => {
   const [rows, setRows] = useState<ProductProps[]>([]);
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  const [openStockControl, setOpenStockControl] = useState(false);
   const [editingObj, setEditingObj] = useState<ProductProps | null>(null);
   const customizer = useSelector((state: AppState) => state.customizer);
   const [resObj, setResObj] = useState<any>({
     users: [],
   });
+  const [type, setType] = useState('');
 
   const handleOpen = () => setOpen(true);
 
@@ -169,13 +250,22 @@ const UsersTable = () => {
     }
   };
 
+  const handleOpenStock = async () => {
+    try {
+      setOpenStockControl(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleClose = () => {
     setOpen(false);
     setOpenEdit(false);
+    setOpenStockControl(false);
 
     setTimeout(async () => {
       getList();
-    }, 1000);
+    }, 500);
   };
 
   const { getProducts, deleteProduct } = useContext(ProductContext);
@@ -186,12 +276,22 @@ const UsersTable = () => {
     setRows(list);
   };
 
-  const handleEditUser = (id: string) => {
+  const handleEdit = (id: string) => {
     const objToEdit = rows.find((product) => product.id === id);
 
     if (objToEdit) {
       setEditingObj(objToEdit);
       handleOpenEdit();
+    }
+  };
+
+  const handleEditStock = (id: string, type: string) => {
+    const objToEdit = rows.find((product) => product.id === id);
+
+    if (objToEdit) {
+      setEditingObj(objToEdit);
+      setType(type);
+      handleOpenStock();
     }
   };
 
@@ -208,7 +308,7 @@ const UsersTable = () => {
         users: resUsers,
       });
     } catch (error) {
-       console.log(error);
+      console.log(error);
     }
   };
 
@@ -350,6 +450,13 @@ const UsersTable = () => {
         handleClose={handleClose}
         obj={editingObj}
         resObj={resObj}
+      />
+
+      <StockControlForm
+        open={openStockControl}
+        handleClose={handleClose}
+        product={editingObj}
+        type={type}
       />
     </LocalizationProvider>
   );

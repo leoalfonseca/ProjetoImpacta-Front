@@ -1,7 +1,7 @@
 import { ReactNode, createContext } from 'react';
 import { toast } from 'react-toastify';
 import { api } from 'services/api';
-import { ProductProps } from 'types/product';
+import { ProductProps, StockProps } from 'types/product';
 
 interface IUserProvider {
   children: ReactNode;
@@ -12,6 +12,7 @@ interface IUserContext {
   getProducts: () => Promise<ProductProps[]>;
   deleteProduct: (id: string) => Promise<void>;
   editProduct: (id: string, updatedData: ProductProps) => Promise<void>;
+  changeStock: (id: string, amount: StockProps, type: string) => Promise<void>;
 }
 
 const ProductContext = createContext({} as IUserContext);
@@ -43,7 +44,18 @@ const ProductProvider = ({ children }: IUserProvider) => {
       toast.success('Produto alterado com sucesso!');
     } catch (error) {
       console.error(error);
-      toast.error('Algo deu errado ao editar o usuário!');
+      toast.error('Algo deu errado ao editar o produto!');
+      throw error;
+    }
+  };
+
+  const changeStock = async (id: string, amount: StockProps, type: string) => {
+    try {
+      await api.patch(`/products/${id}/${type}`, amount);
+      toast.success('Estoque atualizado com sucesso!');
+    } catch (error) {
+      console.error(error);
+      toast.error('Algo deu errado ao editar o estoue!');
       throw error;
     }
   };
@@ -55,6 +67,7 @@ const ProductProvider = ({ children }: IUserProvider) => {
         createProduct,
         deleteProduct,
         editProduct,
+        changeStock,
       }}
     >
       {children}
